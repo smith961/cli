@@ -20,7 +20,7 @@ class Artist(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String, unique=True, nullable=False)
     genre = Column(String)
-    songs = relationship('Song' backref='artist')
+    songs = relationship('Song' ,backref='artist')
 
 class Song(Base):
     __tablename__ = 'songs_table'
@@ -53,3 +53,70 @@ def create_artist():
     genre = input(colored('Genre: ', "gold"))
 
     find_or_create_artist(title, genre)
+
+#Function to find or create a song
+def find_or_create_song(title, artist_name, release_date, bpm):
+    artist = session.query(Artist).filter(Artist.title == artist_name).first()
+
+    if artist is None:
+        print(colored(f"Artist '{artist_name}' not found. Song not created", "red"))
+        return
+    song = session.query(Song).filter(Song.title == title, Song.artist_id == artist.id).first()
+
+    if song is None:
+        song = Song(
+            title= title,
+            artist_id = artist.id,
+            release_date=release_date,
+            bmp = bpm
+        )
+        session.add(song)
+        session.commit()
+        print(colored(f"Song '{title}' added with ID {song.id}", "green" ))
+
+    else:
+        print(colored(f"Song '{title}' already exists with ID {song.id}", "red"))
+
+    #Function to create a song
+    def create_song():
+        artists = session.query(Artist).all()
+        artist_choices = {artist.title: artist for artist in artists}
+
+        title = input(colored('Song Title: ', 'gold'))
+        artist_name = input(colored('Select Artist or enter "new" to create a new artist: ', "gold"))
+
+        if artist_name.lower() == "new":
+            #Create a new artist
+            new_artist_name = input(colored('New Artist Name: ', "gold"))
+            new_artist_genre = input(colored('Genre: ', "gold"))
+
+            if not new_artist_name:
+                print(colored("Artist Name cannot be empty.", "red"))
+                return
+            
+            find_or_create_artist(new_artist_name, new_artist_genre)
+            artist_name = new_artist_name
+        elif artist_name not in artist_choices:
+            print(colored("Invalid Artist Name.", "red"))
+            return
+        release_date = input(colored ('Release Date: ', "gold"))
+        bpm = input(colored('BPM (optional): ', "gold"))
+
+        if not title:
+            print(colored("Song Title cannot be empty.", "red"))
+            return 
+        
+        if not release_date:
+            print(colored("Release Date cannot be empty.", "red"))
+        
+        if not bpm:
+            bpm = None
+        elif not bpm.isdigit() or len(bpm) == 0:
+            print(colored("Invalid BPM input. BPM set to None.", "red"))
+            bpm = None
+        else:
+            bpm= int(bpm)
+        
+        find_or_create_song(title, artist_name, release_date, bpm)
+
+    
