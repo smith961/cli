@@ -6,7 +6,7 @@ from termcolor import colored
 import pyfiglet
 
 #Create the database engine and session
-DATABASE_URL = 'sqlite:///mydatabase.db'
+DATABASE_URL = 'sqlite:///songdatabase.db'
 engine = create_engine(DATABASE_URL)
 Session = sessionmaker(bind=engine)
 session = Session()  #Create a session instance
@@ -118,5 +118,180 @@ def find_or_create_song(title, artist_name, release_date, bpm):
             bpm= int(bpm)
         
         find_or_create_song(title, artist_name, release_date, bpm)
+
+#Function to update an artist
+def update_artist():
+    artist_name = input(colored('Enter Artist Name to update:', "cyan"))
+    artist = session.query(Artist).filter(Artist.title == artist_name).first()
+
+    if artist:
+        new_title = input('New Artist Name: ')
+        new_genre = input('New Genre: ')
+        artist.title = new_title
+        artist.genre = new_genre
+        session.commit()
+        print(colored(f"Artist Name {artist_name} updated.", "green"))
+    else:
+        print(colored(f"Artist '{artist_name}' not found.", "red"))
+
+
+#FUNCTION TO DELETE AN ARTIST BY NAME OR ID
+def delete_artist():
+    artist_input = input('Enter Artist Name or ID to delete:  ')
+
+    if artist_input.isdigit():
+        artist = session.query(Artist).filter(Artist.id == int(artist_input)).first()
+    else:
+        artist = session.query(Artist).filter(Artist.title == artist_input).first()
+    
+    if artist:
+        session.delete(artist)
+        session.commit()
+        print(f"Artist {artist.title} (ID; {artist.id}) deleted.")
+
+# Function to delete a song by title or ID
+def delete_song():
+    song_input = input('Enter Song Title or ID to delete: ')
+
+    #Check if the input is a digit (ID) or not (Title)
+    if song_input.isdigit():
+        song = session.query(Song).filter(Song.id == int(song_input)).first()
+    else:
+        song = session.query(Song).filter(Song.title == song_input).first()
+    
+    if song:
+        session.delete(song)
+        session.commit()
+        print(f"Song '{song.title}' (ID: {song.id}) deleted.")
+    else:
+        print(colored(f"Song '{song_input}' not found.", "red"))
+
+#Function to list songs by a selected artist
+def list_songs_by_artist(artist):
+    songs = session.query(Song).filter(Song.artist_id == artist.id).all()
+    if songs:
+        print(colored(f"Songs by {artist.title}:", "cyan"))
+        for song in songs:
+            print(
+                colored(f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}, "
+                        f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
+                        f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
+                        f"{colored('BPM:', 'yellow')} {colored(song.bpm, 'green')} ", 
+                        "cyan")
+            )
+    else:
+        print(colored(f"No songs found for {artist.title}.", "red"))
+
+# Function to list artists
+def list_artists():
+    while True:
+        artists = session.query(Artist).order_by(Artist.title).all()
+        if artists:
+            # Print a bigger "List of Artists" text
+            ascii_banner = pyfiglet.figlet_format("Artists", font = "big")
+            print(colored(ascii_banner, "red"))
+
+            artist_choices = [artist.title for artist in artists]
+            artist_choices.append("Back") #Add a "Back" option
+            # Remove the "Delete Artist by ID" option
+            artist_name = inquirer.prompt([
+                inquirer.List('artist_name',
+                            message = colored("Select an artist:", "cyan"),
+                            choices = artist_choices
+                            )
+            ])['artist_name']
+
+            if artist_name == "Back":
+                return #Go back to the previous menu
+            else:
+                artist = session.query(Artist).filter(Artist.title == artist_name).first()
+                if artist:
+                    #Display artist.id, artist.title, and artist.genre in green and "Id:", "Name:", "Genre:" in cyan
+                    print(
+                        f"{colored('Id:', 'yellow')} {colored(artist.id, 'green')}, "
+                        f"{colored('Name:', 'yellow')} {colored(artist.title, 'green')}, "
+                        f"{colored('Genre:', 'yellow')} {colored(artist.genre, 'green')}"
+                    )
+
+                    # Option to list songs for the selected artist
+                    list_songs_option = input(colored("List songs for this artist? (y/n): ", "cyan"))
+                    if list_songs_option.lower() == "y":
+                        list_songs_by_artist(artist)
+                else:
+                    print(colored(f"Artist '{artist_name}' not found.", "red"))
+        else:
+            print(colored("No artists found in the database.", "red"))
+
+# Function to list songs alphabetically
+def list_songs():
+    while True:
+        songs = session.query(Song).order_by(Song.title).all()
+        if songs:
+            ascii_banner = pyfiglet.figlet_format("Songs", font="big")
+            print(colored(ascii_banner, "red"))
+            song_choices = [song.title for song in songs ]
+            song_choices.append("Back") #Add a "Back" option
+            # Remove the "Delete Song by ID" option
+            song_title = inquirer.prompt([
+                inquirer.List('song_title',
+                              message=colored("Select a song:", "cyan"),
+                              choices=song_choices)
+            ])['song_title']
+
+            if song_title == "Back":
+                return #Go back to the previous menu
+            else:
+                song = song.query(Song).filter(Song.title == song_title).first()
+                if song:
+                    artist_name = song.artist.title if song.artist else "Unknown Artist"
+                    print(
+                        colored(f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}, "
+                                f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
+                                f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
+                                f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
+                                f"{colored('BPM:', 'yellow')} {colored(song.bpm, 'green')}",
+                                "cyan")
+                    )
+                else:
+                    print(colored(f"Song '{song_title}' not found.", "red"))
+        else:
+            print(colored("No songs found in the database.", "red"))
+        
+        # Function to list songs by BPM
+        def list_songs_by_bpm():
+            songs = session.query(Song).order_by(Song.bpm).all()
+            if songs:
+                print(colored("List of Songs by BPM:", "cyan"))
+                for song in songs:
+                    artist_name = song.artist.title if song.artist else "Unknown Artist"
+                    bpm = song.bpm if song.bpm is not None else "N/A"
+
+                # Colorise labels and values separately with the desired order
+                formatted_output = (
+                    f"{colored('BPM:', 'yellow')} {colored(bpm, 'green')}, "
+                    f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
+                    f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
+                    f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
+                    f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}"
+                )
+
+                print(formatted_output)
+            else:
+                print(colored("No songs found in the database.", "red"))
+
+
+# Function to manage the main menu 
+
+def main():
+
+    pass
+
+
+if __name__ == '__main__':
+    main()
+
+
+
+
 
     
