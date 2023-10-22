@@ -78,46 +78,47 @@ def find_or_create_song(title, artist_name, release_date, bpm):
         print(colored(f"Song '{title}' already exists with ID {song.id}", "red"))
 
     #Function to create a song
-    def create_song():
-        artists = session.query(Artist).all()
-        artist_choices = {artist.title: artist for artist in artists}
+def create_song():
+    artists = session.query(Artist).all()
+    artist_choices = {artist.title: artist for artist in artists}
 
-        title = input(colored('Song Title: ', 'gold'))
-        artist_name = input(colored('Select Artist or enter "new" to create a new artist: ', "gold"))
+    title = input(colored('Song Title: ', 'gold'))
+    artist_name = input(colored('Select Artist or enter "new" to create a new artist: ', "gold"))
 
-        if artist_name.lower() == "new":
-            #Create a new artist
-            new_artist_name = input(colored('New Artist Name: ', "gold"))
-            new_artist_genre = input(colored('Genre: ', "gold"))
+    if artist_name.lower() == "new":
+        #Create a new artist
+        new_artist_name = input(colored('New Artist Name: ', "gold"))
+        new_artist_genre = input(colored('Genre: ', "gold"))
 
-            if not new_artist_name:
-                print(colored("Artist Name cannot be empty.", "red"))
-                return
-            
-            find_or_create_artist(new_artist_name, new_artist_genre)
-            artist_name = new_artist_name
-        elif artist_name not in artist_choices:
-            print(colored("Invalid Artist Name.", "red"))
+        if not new_artist_name:
+            print(colored("Artist Name cannot be empty.", "red"))
             return
-        release_date = input(colored ('Release Date: ', "gold"))
-        bpm = input(colored('BPM (optional): ', "gold"))
+            
+        find_or_create_artist(new_artist_name, new_artist_genre)
+        artist_name = new_artist_name
+    elif artist_name not in artist_choices:
+        print(colored("Invalid Artist Name.", "red"))
+        return
+ 
+    release_date = input(colored ('Release Date: ', "gold"))
+    bpm = input(colored('BPM (optional): ', "gold"))
 
-        if not title:
-            print(colored("Song Title cannot be empty.", "red"))
-            return 
+    if not title:
+        print(colored("Song Title cannot be empty.", "red"))
+        return 
         
-        if not release_date:
-            print(colored("Release Date cannot be empty.", "red"))
+    if not release_date:
+        print(colored("Release Date cannot be empty.", "red"))
         
-        if not bpm:
-            bpm = None
-        elif not bpm.isdigit() or len(bpm) == 0:
-            print(colored("Invalid BPM input. BPM set to None.", "red"))
-            bpm = None
-        else:
-            bpm= int(bpm)
+    if not bpm:
+        bpm = None
+    elif not bpm.isdigit() or len(bpm) == 0:
+        print(colored("Invalid BPM input. BPM set to None.", "red"))
+        bpm = None
+    else:
+        bpm= int(bpm)
         
-        find_or_create_song(title, artist_name, release_date, bpm)
+    find_or_create_song(title, artist_name, release_date, bpm)
 
 #Function to update an artist
 def update_artist():
@@ -257,34 +258,158 @@ def list_songs():
         else:
             print(colored("No songs found in the database.", "red"))
         
-        # Function to list songs by BPM
-        def list_songs_by_bpm():
-            songs = session.query(Song).order_by(Song.bpm).all()
-            if songs:
-                print(colored("List of Songs by BPM:", "cyan"))
-                for song in songs:
-                    artist_name = song.artist.title if song.artist else "Unknown Artist"
-                    bpm = song.bpm if song.bpm is not None else "N/A"
+# Function to list songs by BPM
+def list_songs_by_bpm():
+    songs = session.query(Song).order_by(Song.bpm).all()
+    if songs:
+        print(colored("List of Songs by BPM:", "cyan"))
+    for song in songs:
+        artist_name = song.artist.title if song.artist else "Unknown Artist"
+        bpm = song.bpm if song.bpm is not None else "N/A"
 
-                # Colorise labels and values separately with the desired order
-                formatted_output = (
-                    f"{colored('BPM:', 'yellow')} {colored(bpm, 'green')}, "
-                    f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
-                    f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
-                    f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
-                    f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}"
-                )
-
-                print(formatted_output)
-            else:
-                print(colored("No songs found in the database.", "red"))
+    # Colorise labels and values separately with the desired order
+        formatted_output = (
+        f"{colored('BPM:', 'yellow')} {colored(bpm, 'green')}, "
+        f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
+        f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
+        f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
+        f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}"
+        )
+        print(formatted_output)
+    else:
+        print(colored("No songs found in the database.", "red"))
 
 
 # Function to manage the main menu 
 
 def main():
+    while True:
+        ascii_banner = pyfiglet.figlet_format("SOUNDPLAY")
+        print(colored(ascii_banner, "cyan"))
+        print(colored("Choose an operations:", "cyan"))
+        print(colored("1. Add Artist", "light_yellow"))
+        print(colored("2. Add Song", "light_yellow"))
+        print(colored("3. Update Artist", "light_yellow"))
+        print(colored("4. Delete Artist", "light_yellow"))
+        print(colored("5. Delete Song", "light_yellow")) #Add the option to delete a song
+        print(colored("6. Lists", "light_yellow")) #Create a submenu for listing operations
+        print(colored("7. Exit", "light_yellow")) #Update the exit option
+
+        choice = input(colored("Enter your choice (1-7): ", "cyan"))
+        if choice == '1' :
+            create_artist()
+            ascii_banner = pyfiglet.figlet_format("Artist is Added!! ")
+            print(colored(ascii_banner, "red"))
+        elif choice == '2' :
+            create_song()
+            ascii_banner = pyfiglet.figlet_format("Song is Added!!")
+            print(colored(ascii_banner, "red"))
+        elif choice == '3':
+            update_artist()
+        elif choice == '4':
+            delete_artist()
+        elif choice == '6':
+            list_operations() # Call the new function for listing operations
+        elif choice == '7':
+            print(r'''
+               ⣀⠀⣘⣩⣅⣤⣤⣄⣠⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠄⢈⣻⣿⣿⢷⣾⣭⣯⣯⡳⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣧⠻⠿⡻⢿⠿⡾⣽⣿⣳⣧⡷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⢰⡶⢈⠐⡀⠀⠀⠁⠀⠀⠀⠈⢿⡽⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢫⢅⢠⣥⣐⡀⠀⠀⠀⠀⠀⠀⢸⢳⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠆⠡⠱⠒⠖⣙⠂⠈⠵⣖⡂⠄⢸⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⠆⠀⠰⡈⢆⣑⠂⠀⠀⠀⠀⠀⠏⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢗⠀⠱⡈⢆⠙⠉⠃⠀⠀⠀⠀⠃⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠦⡡⢘⠩⠯⠒⠀⠀⠀⢀⠐⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡄⢔⡢⢡⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⢆⠸⡁⠋⠃⠁⠀⢀⢠⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⡰⠌⣒⠡⠄⠀⢀⠔⠁⣸⣿⣷⣤⣀⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⣐⣤⡄⠀⠀⠘⢚⣒⢂⠇⣜⠒⠉⠀⢀⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣦⣔⣀⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⡀⢀⢠⣤⣶⣿⣿⣿⡆⠀⠀⠐⡂⠌⠐⠝⠀⠀⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣤⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢨⣶⣿⣿⣿⣿⣿⣿⣿⣿⣤⡶⢐⡑⣊⠀⡴⢤⣀⣀⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀⠷⡈⠀⠶⢶⣰⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣉⠑⠚⣙⡒⠒⠲⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡁⠀⠀⠀⠀⠀⠀⠀⠀
+⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡷⠶⠀⠀⠤⣬⣍⣹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄⠀⠀⠀⠀⠀⠀⠀⠀
+⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣛⣙⠀⢠⠲⠖⠶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀
+⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣭⣰⢘⣙⣛⣲⣿⣿⣿⣿⡿⡻⠿⠿⠿⠿⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀
+⢿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠶⢾⡠⢤⣭⣽⣿⣿⣿⣿⡟⣱⠦⠄⠤⠐⡄⠹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣤⡀⠀
+⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡛⣻⡕⠶⠶⣿⣿⣿⣿⣿⣿⣗⣎⠒⣀⠃⡐⢀⠙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
+⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣭⣹⣏⣛⣛⣿⣿⣿⣿⣿⣿⣿⣞⣍⣉⢉⠰⠀⠠⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠅
+⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠶⢼⡧⢤⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣣⣡⣛⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣅
+⡿⣷⣽⡿⠛⠋⠉⣉⡐⠶⣾⣾⣟⣻⡕⠶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣹⣫⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠗
+⢸⣿⣟⣥⡶⢘⡻⢶⡹⣛⣼⣿⣯⣽⢯⣙⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠿⣿⣿⣿⣿⣿⣿⡿⠿⠟⠁⠀
+⠘⢟⣾⣿⣿⣚⠷⣳⢳⣫⣽⣿⣛⣾⡷⢾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠀⠀⠁⠀⠈⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠙⢋⣿⣿⣯⣙⣯⣵⣿⣿⣯⣽⣟⣻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡯⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠉⠛⢻⠟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢸⣿⣿⣿⣟⡟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⣡⣿⣿⣿⣿⡗⣮⢻⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⠀
+''')
+            ascii_banner = pyfiglet.figlet_format("GoodBye!!")
+            print(colored(ascii_banner, "red"))
+
+            break
+        else:
+            print(colored("Invalid choice. Please enter a valid option (1-7).", "red"))
+
+
 
     pass
+# Function to manage the list operations submenu
+def list_operations():
+    while True:
+        print(colored("List Operations:", "cyan"))
+        print(colored("1. Artists", "light_yellow"))
+        print(colored("2. Songs", "light_yellow"))
+        print(colored("3. BPM", "light_yellow"))
+        print(colored("4. Back to Main Menu", "light_yellow"))
+
+        choice = input(colored("Enter your choice (1-4): ", "cyan"))
+
+        if choice == '1':
+            list_artists()
+        elif choice == '2':
+            list_songs()
+        elif choice == '3':
+            ascii_banner = pyfiglet.figlet_format("BPM!!")
+            print(colored(ascii_banner, "red"))
+            list_songs_by_bpm()
+        elif choice == '4':
+            break
+        else:
+            print(colored("Invalid choice. Please enter a valid option (1-4).", "red"))
+            print(r'''
+                  ⣀⣀⠤⠴⠖⠒⠒⠉⠉⠁⠐⠲⢤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡤⠖⠊⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠳⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠞⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠀⠀⠀⢀⡀⠀⠀⠀⠀⠈⢣⣄⡀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠷⢦⣴⣿⣿⣶⣶⣖⣲⣾⣿⣿⡛⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⡰⠋⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡼⠋⠁⠀⠈⠳⡀⠀⠉⢻⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⢀⡞⠁⠀⠀⣾⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⡀⠀⠙⢦⠈⢦⣇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⡰⠋⠀⠀⠀⣰⣋⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡞⠀⠀⠀⠀⢠⣏⣈⡦⠀⠈⢳⠀⠻⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⡄⠀⠀⠀⣠⣶⠟⠁⠀⠀⠀⠉⠛⠦⣄⠀⠀⠀⠀⠀⠘⡇⠀⠀⠀⠀⠀⠀⠉⠀⠀⠀⠀⢣⠀⢹⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢸⡇⠀⠀⢚⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⡏⠀⠀⠀⠀⠀⠙⢦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠄⠀⢿⢦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⢸⠃⠀⢠⡿⠃⠃⡴⠲⡀⠀⠀⠀⠀⠀⣸⠁⠀⢀⣀⣤⣄⣀⣀⡙⠢⣄⣀⠀⠀⠀⠀⢀⣠⠟⠀⠀⠘⡎⢧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡆⡇⠀⠀⠈⠀⣼⠀⠓⠚⠀⠀⠀⠀⢀⡴⠃⢀⡴⠋⠁⠈⢧⠀⢠⠟⠑⢶⣍⡙⠛⠛⠛⠉⠀⠀⠀⠀⠀⠸⢼⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣇⡇⠀⠀⠀⣠⠻⣄⠀⠀⠀⠀⢀⣴⠏⠀⡰⢳⡀⠀⠀⠀⢈⡷⠃⠀⠀⠈⢢⣉⣙⣻⠟⠲⣤⠀⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⣿⡇⠀⠀⠸⠃⠀⠉⠓⠒⠒⠒⠋⠁⠀⢰⠃⠀⢷⣄⡠⠴⠋⠀⠀⠀⠀⠀⠀⠈⠉⠀⠀⠀⠈⢧⠀⠀⠀⠀⢸⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡏⠇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡿⠀⠀⡞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢳⡤⠀⠀⠘⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⡇⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⢀⡾⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡶⠏⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠃⢻⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠏⠁⠀⠀⠀⠀⠀⠀⠀⣀⣀⡤⠤⠴⠲⠒⠒⠚⠉⠁⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⢰⡘⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⠀⠀⠀⠀⢀⣠⠴⠖⠋⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠈⢇⢸⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠇⠀⢀⡠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠈⠺⣇⠀⠀⠀⠀⠀⠀⠀⠀⢀⡟⢀⠴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡇⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡔⠒⠲⣶⣶⠒⠹⣿⠉⠙⢶⡀
+⠀⠀⠀⢿⣆⠀⠀⠀⠀⠀⠀⠀⡾⠖⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⢀⣀⣀⣠⠤⣶⠶⠶⣦⡀⠀⠀⢀⡇⢀⡶⠛⠙⢶⠀⠀⠀⠀⠀⢠⠇⠀⠀⢸⠇⠀⠀⣸⠀⠀⠀⢣
+⠀⠀⠀⢸⡍⠣⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⢦⣤⠀⠀⠀⠀⠀⠀⡟⠀⠀⠙⣿⠁⠀⢻⠀⠀⠈⢷⠀⠀⣸⠇⠌⠀⠀⠀⢸⡇⠀⠀⠀⠀⡼⠀⠀⠀⣼⠀⠀⢠⡏⠀⠀⠀⢸
+⠀⠀⠀⠀⠇⠀⠈⠒⢤⣀⠀⠀⠀⠀⠀⢰⠏⠀⠀⠸⡇⠀⠀⠀⠀⢸⡇⠀⠀⠀⡏⠀⠀⣼⠀⠀⠀⢸⡆⣰⠏⠀⡇⠀⠀⠀⢸⡇⠀⠀⢀⡴⠁⠀⠀⣼⠋⠀⣰⠟⠀⠀⠀⠀⡞
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⡿⠀⠀⠀⠀⡇⠀⠀⠀⢀⡾⠀⠀⢀⡼⠁⠀⣴⠏⠀⠀⠀⢸⡷⠃⠀⠀⡇⠀⠀⠀⠐⠓⠚⠉⠁⠀⠀⠀⠊⠀⠀⠠⠋⠀⠀⠀⠀⣸⠇
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣗⠀⠀⠀⠀⣧⣤⠤⠖⠛⠁⠀⢠⠛⠁⠀⡼⠋⠀⠀⠀⢀⡞⠁⠀⠀⠀⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⠞⠃⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠀⠀⠀⠀⣠⡿⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⠂⠀⠀⠀⠀⣠⠞⠋⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⠟⠁⠀⢀⣠⡴⠚⠁⠀⠀⠀⠀⠀⠀⢀⣤⡶⠛⠁⠀⠀⢀⣠⠞⠁⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠞⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡴⠛⠂⠒⠒⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠟⠁⠀⣀⣤⠶⠞⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠴⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⠶⠚⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢠⠞⢁⠀⠐⠈⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠶⠛⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+''')
+
+
 
 
 if __name__ == '__main__':
