@@ -49,8 +49,8 @@ def find_or_create_artist(title, genre):
 
 #Function to create an artist
 def create_artist():
-    title = input(colored('Artist Name: ', "gold"))
-    genre = input(colored('Genre: ', "gold"))
+    title = input(colored('Artist Name: ', "green"))
+    genre = input(colored('Genre: ', "green"))
 
     find_or_create_artist(title, genre)
 
@@ -68,7 +68,7 @@ def find_or_create_song(title, artist_name, release_date, bpm):
             title= title,
             artist_id = artist.id,
             release_date=release_date,
-            bmp = bpm
+            bpm = bpm
         )
         session.add(song)
         session.commit()
@@ -82,13 +82,13 @@ def create_song():
     artists = session.query(Artist).all()
     artist_choices = {artist.title: artist for artist in artists}
 
-    title = input(colored('Song Title: ', 'gold'))
-    artist_name = input(colored('Select Artist or enter "new" to create a new artist: ', "gold"))
+    title = input(colored('Song Title: ', 'green'))
+    artist_name = input(colored('Select Artist or enter "new" to create a new artist: ', "green"))
 
     if artist_name.lower() == "new":
         #Create a new artist
-        new_artist_name = input(colored('New Artist Name: ', "gold"))
-        new_artist_genre = input(colored('Genre: ', "gold"))
+        new_artist_name = input(colored('New Artist Name: ', "green"))
+        new_artist_genre = input(colored('Genre: ', "green"))
 
         if not new_artist_name:
             print(colored("Artist Name cannot be empty.", "red"))
@@ -100,8 +100,8 @@ def create_song():
         print(colored("Invalid Artist Name.", "red"))
         return
  
-    release_date = input(colored ('Release Date: ', "gold"))
-    bpm = input(colored('BPM (optional): ', "gold"))
+    release_date = input(colored ('Release Date: ', "green"))
+    bpm = input(colored('BPM (optional): ', "green"))
 
     if not title:
         print(colored("Song Title cannot be empty.", "red"))
@@ -122,7 +122,7 @@ def create_song():
 
 #Function to update an artist
 def update_artist():
-    artist_name = input(colored('Enter Artist Name to update:', "cyan"))
+    artist_name = input(colored('Enter Artist Name to update:', "green"))
     artist = session.query(Artist).filter(Artist.title == artist_name).first()
 
     if artist:
@@ -171,14 +171,14 @@ def delete_song():
 def list_songs_by_artist(artist):
     songs = session.query(Song).filter(Song.artist_id == artist.id).all()
     if songs:
-        print(colored(f"Songs by {artist.title}:", "cyan"))
+        print(colored(f"Songs by {artist.title}:", "green"))
         for song in songs:
             print(
                 colored(f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}, "
                         f"{colored('Title:', 'yellow')} {colored(song.title, 'green')}, "
                         f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
                         f"{colored('BPM:', 'yellow')} {colored(song.bpm, 'green')} ", 
-                        "cyan")
+                        "green")
             )
     else:
         print(colored(f"No songs found for {artist.title}.", "red"))
@@ -197,7 +197,7 @@ def list_artists():
             # Remove the "Delete Artist by ID" option
             artist_name = inquirer.prompt([
                 inquirer.List('artist_name',
-                            message = colored("Select an artist:", "cyan"),
+                            message = colored("Select an artist:", "green"),
                             choices = artist_choices
                             )
             ])['artist_name']
@@ -207,7 +207,7 @@ def list_artists():
             else:
                 artist = session.query(Artist).filter(Artist.title == artist_name).first()
                 if artist:
-                    #Display artist.id, artist.title, and artist.genre in green and "Id:", "Name:", "Genre:" in cyan
+                    #Display artist.id, artist.title, and artist.genre in green and "Id:", "Name:", "Genre:" in green
                     print(
                         f"{colored('Id:', 'yellow')} {colored(artist.id, 'green')}, "
                         f"{colored('Name:', 'yellow')} {colored(artist.title, 'green')}, "
@@ -215,7 +215,7 @@ def list_artists():
                     )
 
                     # Option to list songs for the selected artist
-                    list_songs_option = input(colored("List songs for this artist? (y/n): ", "cyan"))
+                    list_songs_option = input(colored("List songs for this artist? (y/n): ", "green"))
                     if list_songs_option.lower() == "y":
                         list_songs_by_artist(artist)
                 else:
@@ -232,10 +232,9 @@ def list_songs():
             print(colored(ascii_banner, "red"))
             song_choices = [song.title for song in songs ]
             song_choices.append("Back") #Add a "Back" option
-            # Remove the "Delete Song by ID" option
             song_title = inquirer.prompt([
                 inquirer.List('song_title',
-                              message=colored("Select a song:", "cyan"),
+                              message=colored("Select a song:", "green"),
                               choices=song_choices)
             ])['song_title']
 
@@ -251,7 +250,7 @@ def list_songs():
                                 f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
                                 f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
                                 f"{colored('BPM:', 'yellow')} {colored(song.bpm, 'green')}",
-                                "cyan")
+                                "green")
                     )
                 else:
                     print(colored(f"Song '{song_title}' not found.", "red"))
@@ -262,7 +261,7 @@ def list_songs():
 def list_songs_by_bpm():
     songs = session.query(Song).order_by(Song.bpm).all()
     if songs:
-        print(colored("List of Songs by BPM:", "cyan"))
+        print(colored("List of Songs by BPM:", "green"))
     for song in songs:
         artist_name = song.artist.title if song.artist else "Unknown Artist"
         bpm = song.bpm if song.bpm is not None else "N/A"
@@ -285,8 +284,8 @@ def list_songs_by_bpm():
 def main():
     while True:
         ascii_banner = pyfiglet.figlet_format("SOUNDPLAY")
-        print(colored(ascii_banner, "cyan"))
-        print(colored("Choose an operations:", "cyan"))
+        print(colored(ascii_banner, "green"))
+        print(colored("Choose an operations:", "green"))
         print(colored("1. Add Artist", "light_yellow"))
         print(colored("2. Add Song", "light_yellow"))
         print(colored("3. Update Artist", "light_yellow"))
@@ -295,7 +294,7 @@ def main():
         print(colored("6. Lists", "light_yellow")) #Create a submenu for listing operations
         print(colored("7. Exit", "light_yellow")) #Update the exit option
 
-        choice = input(colored("Enter your choice (1-7): ", "cyan"))
+        choice = input(colored("Enter your choice (1-7): ", "green"))
         if choice == '1' :
             create_artist()
             ascii_banner = pyfiglet.figlet_format("Artist is Added!! ")
@@ -357,13 +356,13 @@ def main():
 # Function to manage the list operations submenu
 def list_operations():
     while True:
-        print(colored("List Operations:", "cyan"))
+        print(colored("List Operations:", "green"))
         print(colored("1. Artists", "light_yellow"))
         print(colored("2. Songs", "light_yellow"))
         print(colored("3. BPM", "light_yellow"))
         print(colored("4. Back to Main Menu", "light_yellow"))
 
-        choice = input(colored("Enter your choice (1-4): ", "cyan"))
+        choice = input(colored("Enter your choice (1-4): ", "green"))
 
         if choice == '1':
             list_artists()
