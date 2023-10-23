@@ -77,7 +77,7 @@ Choose an operation by entering a number from 1 to 4:
 4: Back to Main Menu
 
 # Contributing
-Contributions to SOUNDPLAY are welcome! If you have any ideas for improvements or find any issues, please open an issue or create a pull request on the RYME GitHub repository.
+Contributions to SOUNDPLAY are welcome! If you have any ideas for improvements or find any issues, please open an issue or create a pull request on the SOUNDPLAY GitHub repository.
 
 # License
-SOUNDPLAY is released under the MIT License. You are free to use, modify, and distribute this software as per the terms of the license.
+SOUNDPLAY is released under the MIT License. You are free to use, modify, and distribute this software as per the terms of the license. 

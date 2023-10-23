@@ -274,7 +274,7 @@ def list_songs_by_bpm():
         f"{colored('Artist:', 'yellow')} {colored(artist_name, 'green')}, "
         f"{colored('Release Date:', 'yellow')} {colored(song.release_date, 'green')}, "
         f"{colored('ID:', 'yellow')} {colored(song.id, 'green')}"
-        )
+                )
         print(formatted_output)
     else:
         print(colored("No songs found in the database.", "red"))
